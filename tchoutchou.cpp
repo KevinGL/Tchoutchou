@@ -84,7 +84,7 @@ namespace tchoutchou
 
             std::vector<glm::vec3> inters;
 
-            if(vehicle->forth)
+            //if(vehicle->forth)
             {
                 demiSphere.direction=line.points[indexPointPrev-1]-line.points[indexPointPrev];
 
@@ -111,7 +111,7 @@ namespace tchoutchou
                 }
             }
 
-            else
+            /*else
             {
                 demiSphere.direction=line.points[indexPointPrev+1]-line.points[indexPointPrev];
 
@@ -136,7 +136,7 @@ namespace tchoutchou
                         break;
                     }
                 }
-            }
+            }*/
         }
 
         return true;
