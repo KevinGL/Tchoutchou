@@ -28,11 +28,12 @@ namespace tchoutchou
 
             if(initVehicleOk)
             {
-                std::cout << "- Tchoutchou : Your vehicles has been positionned on their lines :)" << std::endl;
+                std::cout << "- Tchoutchou : Your vehicles have been positionned on their lines :)" << std::endl;
 
-                /*for(unsigned int i=0;i<appVehicles[0].posBogies.size();i++)
+                /*for(unsigned int i=0;i<appVehicles[0].bogies.size();i++)
                 {
-                    std::cout << appVehicles[0].posBogies[i].x << " " << appVehicles[0].posBogies[i].y << " " << appVehicles[0].posBogies[i].z << std::endl;
+                    std::cout << appVehicles[0].bogies[i].pos.x << " " << appVehicles[0].bogies[i].pos.y << " " << appVehicles[0].bogies[i].pos.z << std::endl;
+                    //std::cout << appVehicles[0].bogies[i].before << " " << appVehicles[0].bogies[i].after << std::endl;
                 }
                 std::cout << "________" << std::endl;*/
             }
@@ -70,7 +71,22 @@ namespace tchoutchou
             return false;
         }
 
-        vehicle->posBogies.push_back(line.points[indexPointFirstBogy]);
+        Bogy bogy;
+
+        bogy.pos=line.points[indexPointFirstBogy];
+
+        if(vehicle->forth)
+        {
+            bogy.before=indexPointFirstBogy;
+            bogy.after=indexPointFirstBogy+1;
+        }
+        else
+        {
+            bogy.before=indexPointFirstBogy;
+            bogy.after=indexPointFirstBogy-1;
+        }
+
+        vehicle->bogies.push_back(bogy);
 
         unsigned int indexPointBogyPrev=indexPointFirstBogy;
         unsigned int indexPointPrev=indexPointFirstBogy;
@@ -79,64 +95,48 @@ namespace tchoutchou
         {
             Demisphere demiSphere;
 
-            demiSphere.center=vehicle->posBogies[i-1];
+            demiSphere.center=vehicle->bogies[i-1].pos;
             demiSphere.radius=fabs(vehicle->posInitBogies[i]-vehicle->posInitBogies[i-1]);
 
             std::vector<glm::vec3> inters;
 
-            //if(vehicle->forth)
+            demiSphere.direction=line.points[indexPointPrev-1]-line.points[indexPointPrev];
+
+            //std::cout << "Direction demi-sphere : " << demiSphere.direction.x << " " << demiSphere.direction.y << " " << demiSphere.direction.z << std::endl;
+
+            for(unsigned int j=indexPointFirstBogy;j>=1;j--)
             {
-                demiSphere.direction=line.points[indexPointPrev-1]-line.points[indexPointPrev];
+                Segment seg;
 
-                //std::cout << "Direction demi-sphere : " << demiSphere.direction.x << " " << demiSphere.direction.y << " " << demiSphere.direction.z << std::endl;
+                seg.v1=line.points[j];
+                seg.v2=line.points[j-1];
 
-                for(unsigned int j=indexPointFirstBogy;j>=1;j--)
+                betweenDemisphereSegment(&demiSphere,&seg,inters);
+
+                //std::cout << "Bogy " << i << " point " << j << " : " << inters.size() << std::endl;
+
+                if(inters.size()!=0)
                 {
-                    Segment seg;
+                    bogy.pos=inters[0];
 
-                    seg.v1=line.points[j];
-                    seg.v2=line.points[j-1];
-
-                    betweenDemisphereSegment(&demiSphere,&seg,inters);
-
-                    //std::cout << "Bogy " << i << " point " << j << " : " << inters.size() << std::endl;
-
-                    if(inters.size()!=0)
+                    if(vehicle->forth)
                     {
-                        vehicle->posBogies.push_back(inters[0]);
-                        indexPointPrev=j;
-
-                        break;
+                        bogy.before=j;
+                        bogy.after=j+1;
                     }
+                    else
+                    {
+                        bogy.before=j+1;
+                        bogy.after=j;
+                    }
+
+                    vehicle->bogies.push_back(bogy);
+                    indexPointPrev=j;
+
+                    break;
                 }
             }
 
-            /*else
-            {
-                demiSphere.direction=line.points[indexPointPrev+1]-line.points[indexPointPrev];
-
-                //std::cout << "Direction demi-sphere : " << demiSphere.direction.x << " " << demiSphere.direction.y << " " << demiSphere.direction.z << std::endl;
-
-                for(unsigned int j=0;j<line.points.size()-1;j++)
-                {
-                    Segment seg;
-
-                    seg.v1=line.points[j];
-                    seg.v2=line.points[j+1];
-
-                    betweenDemisphereSegment(&demiSphere,&seg,inters);
-
-                    //std::cout << "Bogy " << i << " point " << j << " : " << inters.size() << std::endl;
-
-                    if(inters.size()!=0)
-                    {
-                        vehicle->posBogies.push_back(inters[0]);
-                        indexPointPrev=j;
-
-                        break;
-                    }
-                }
-            }*/
         }
 
         return true;

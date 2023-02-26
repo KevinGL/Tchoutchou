@@ -14,14 +14,21 @@ namespace tchoutchou
         std::vector<glm::vec3> points;
     };
 
+    struct Bogy
+    {
+        glm::vec3 pos;
+        unsigned int before;
+        unsigned int after;
+    };
+
     struct Vehicle
     {
         std::vector<float> posInitBogies;
-        std::vector<glm::vec3> posBogies;
+        std::vector<Bogy> bogies;
         std::vector<float> carsMass;        //kg
         float maxPower;                     //W
         float throttle=0.0f;                //[-1.0 , 1.0]
-        float speed=0.0f;                   //m/frame
+        float speed=0.2f;                   //m/frame
         unsigned int indexLine;
         unsigned int indexPointFirstBogy;
         bool forth;
@@ -49,10 +56,14 @@ namespace tchoutchou
         unsigned int timeFrame;
 
         bool InitVehicleBogies(Vehicle *vehicle);
+        bool detectOverflowSeg(const glm::vec3 pointBefore,const glm::vec3 pointAfter,const glm::vec3 posBogy,float *overflow);
+        void moveHeadBogy(Vehicle *vehicle,const bool forth);
+        void moveOthersBogies(Vehicle *vehicle,const bool forth);
 
         public :
 
         void Init(std::vector<Line> &appLines,std::vector<Vehicle> &appVehicles,const unsigned int appTimeFrame);
+        void moveVehicle(Vehicle *vehicle);
     };
 
     void betweenDemisphereSegment(Demisphere *demiSphere,Segment *seg,std::vector<glm::vec3> &intersections);
