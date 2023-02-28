@@ -30,12 +30,12 @@ namespace tchoutchou
             {
                 std::cout << "- Tchoutchou : Your vehicles have been positionned on their lines :)" << std::endl;
 
-                /*for(unsigned int i=0;i<appVehicles[0].bogies.size();i++)
+                for(unsigned int i=0;i<appVehicles[0].bogies.size();i++)
                 {
-                    std::cout << appVehicles[0].bogies[i].pos.x << " " << appVehicles[0].bogies[i].pos.y << " " << appVehicles[0].bogies[i].pos.z << std::endl;
-                    //std::cout << appVehicles[0].bogies[i].before << " " << appVehicles[0].bogies[i].after << std::endl;
+                    //std::cout << appVehicles[0].bogies[i].pos.x << " " << appVehicles[0].bogies[i].pos.y << " " << appVehicles[0].bogies[i].pos.z << std::endl;
+                    std::cout << appVehicles[0].bogies[i].before << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].y << ") " << appVehicles[0].bogies[i].after << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].y << ")" << std::endl;
                 }
-                std::cout << "________" << std::endl;*/
+                std::cout << "________" << std::endl;
             }
         }
 
@@ -75,16 +75,8 @@ namespace tchoutchou
 
         bogy.pos=line.points[indexPointFirstBogy];
 
-        if(vehicle->forth)
-        {
-            bogy.before=indexPointFirstBogy;
-            bogy.after=indexPointFirstBogy+1;
-        }
-        else
-        {
-            bogy.before=indexPointFirstBogy;
-            bogy.after=indexPointFirstBogy-1;
-        }
+        bogy.before=indexPointFirstBogy;
+        bogy.after=indexPointFirstBogy+1;
 
         vehicle->bogies.push_back(bogy);
 
@@ -119,16 +111,8 @@ namespace tchoutchou
                 {
                     bogy.pos=inters[0];
 
-                    if(vehicle->forth)
-                    {
-                        bogy.before=j;
-                        bogy.after=j+1;
-                    }
-                    else
-                    {
-                        bogy.before=j+1;
-                        bogy.after=j;
-                    }
+                    bogy.before=j-1;
+                    bogy.after=j;
 
                     vehicle->bogies.push_back(bogy);
                     indexPointPrev=j;

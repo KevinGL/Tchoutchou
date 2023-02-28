@@ -1,5 +1,6 @@
 #include "tchoutchou.h"
 #include <iostream>
+#include <conio.h>
 
 namespace tchoutchou
 {
@@ -13,15 +14,15 @@ namespace tchoutchou
             const glm::vec3 pointBefore=lines[vehicle->indexLine].points[before];
             const glm::vec3 pointAfter=lines[vehicle->indexLine].points[after];
 
-            const float distUntilNexPoint=glm::length(pointAfter-vehicle->bogies[0].pos);
+            const float distUntilNextPoint=glm::length(pointAfter-vehicle->bogies[0].pos);
 
-            //std::cout << vehicle->speed << " " << distUntilNexPoint << std::endl;
-
-            if(vehicle->speed<distUntilNexPoint)
+            if(vehicle->speed<distUntilNextPoint)
             {
                 const glm::vec3 vecMove=vehicle->speed*glm::normalize(pointAfter-pointBefore);
 
                 vehicle->bogies[0].pos+=vecMove;
+
+                //std::cout << "Petite vitesse sens aller" << std::endl;
 
                 float overflow;
 
@@ -44,7 +45,9 @@ namespace tchoutchou
 
             else
             {
-                float distTest=distUntilNexPoint;
+                float distTest=distUntilNextPoint;
+
+                //std::cout << "Grande vitesse sens aller" << std::endl;
 
                 for(unsigned int i=after;i<lines[vehicle->indexLine].points.size()-1;i++)
                 {
@@ -77,7 +80,77 @@ namespace tchoutchou
 
         else
         {
-            //
+            const unsigned int lastBogy=vehicle->bogies.size()-1;
+            const unsigned int before=vehicle->bogies[lastBogy].before;
+            const unsigned int after=vehicle->bogies[lastBogy].after;
+
+            const glm::vec3 pointBefore=lines[vehicle->indexLine].points[before];
+            const glm::vec3 pointAfter=lines[vehicle->indexLine].points[after];
+
+            const float distUntilNextPoint=glm::length(pointBefore-vehicle->bogies[lastBogy].pos);
+
+            if(vehicle->speed<distUntilNextPoint)
+            {
+                const glm::vec3 vecMove=vehicle->speed*glm::normalize(pointBefore-pointAfter);
+
+                //std::cout << vehicle->bogies[lastBogy].pos.x << " " << vehicle->bogies[lastBogy].pos.y << std::endl;
+                vehicle->bogies[lastBogy].pos+=vecMove;
+                /*std::cout << vehicle->bogies[lastBogy].pos.x << " " << vehicle->bogies[lastBogy].pos.y << std::endl;
+
+                std::cout << "Petite vitesse sens retour" << std::endl;*/
+
+                float overflow;
+
+                if(detectOverflowSeg(pointBefore,pointAfter,vehicle->bogies[lastBogy].pos,&overflow))
+                {
+                    vehicle->bogies[lastBogy].before--;
+                    vehicle->bogies[lastBogy].after--;
+
+                    const unsigned int newBefore=vehicle->bogies[lastBogy].before;
+                    const unsigned int newAfter=vehicle->bogies[lastBogy].after;
+
+                    const glm::vec3 newPointBefore=lines[vehicle->indexLine].points[newBefore];
+                    const glm::vec3 newPointAfter=lines[vehicle->indexLine].points[newAfter];
+
+                    const glm::vec3 newVecMove=overflow*glm::normalize(newPointBefore-newPointAfter);
+
+                    vehicle->bogies[lastBogy].pos=newPointAfter+newVecMove;
+                }
+            }
+
+            else
+            {
+                float distTest=distUntilNextPoint;
+
+                //std::cout << "Grande vitesse sens retour" << std::endl;
+
+                for(unsigned int i=before;i>=1;i--)
+                {
+                    const unsigned int newBefore=i-1;
+                    const unsigned int newAfter=i;
+
+                    const glm::vec3 newPointBefore=lines[vehicle->indexLine].points[newBefore];
+                    const glm::vec3 newPointAfter=lines[vehicle->indexLine].points[newAfter];
+
+                    const float segLength=glm::length(newPointAfter-newPointBefore);
+
+                    distTest+=segLength;
+
+                    if(distTest>vehicle->speed)
+                    {
+                        const float distFromBefore=segLength-(distTest-vehicle->speed);
+
+                        const glm::vec3 newVecMove=distFromBefore*glm::normalize(newPointBefore-newPointAfter);
+
+                        vehicle->bogies[lastBogy].pos=newPointAfter+newVecMove;
+
+                        vehicle->bogies[lastBogy].before=newBefore;
+                        vehicle->bogies[lastBogy].after=newAfter;
+
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -128,22 +201,81 @@ namespace tchoutchou
 
         else
         {
-            //
+            const unsigned int lastBogy=vehicle->bogies.size()-1;
+
+            for(int i=lastBogy-1;i>=0;i--)
+            {
+                const glm::vec3 posBogyNext=vehicle->bogies[i+1].pos;
+                const float distFromBogyNext=fabs(vehicle->posInitBogies[i]-vehicle->posInitBogies[i+1]);
+
+                const unsigned int endLoop=vehicle->bogies[i+1].after;
+
+                for(unsigned int j=0;j<endLoop;j++)
+                {
+                    Demisphere demiSphere;
+
+                    demiSphere.center=posBogyNext;
+                    demiSphere.radius=distFromBogyNext;
+
+                    glm::vec3 pointBefore=lines[vehicle->indexLine].points[j];
+                    glm::vec3 pointAfter=lines[vehicle->indexLine].points[j+1];
+
+                    demiSphere.direction=pointBefore-pointAfter;
+
+                    Segment seg;
+
+                    seg.v1=pointBefore;
+                    seg.v2=pointAfter;
+
+                    std::vector<glm::vec3> inters;
+
+                    betweenDemisphereSegment(&demiSphere,&seg,inters);
+
+                    //std::cout << i << " " << inters.size() << std::endl;
+
+                    if(inters.size()!=0)
+                    {
+                        vehicle->bogies[i].pos=inters[0];
+
+                        vehicle->bogies[i].before=j;
+                        vehicle->bogies[i].after=j+1;
+
+                        break;
+                    }
+                }
+            }
         }
     }
 
     void FollowRails::moveVehicle(Vehicle *vehicle)
     {
+        bool forth;
+
         if(vehicle->forth)
         {
-            moveHeadBogy(vehicle,true);
-            moveOthersBogies(vehicle,true);
+            if(!vehicle->reverse)
+            {
+                forth=true;
+            }
+            else
+            {
+                forth=false;
+            }
         }
         else
         {
-            moveHeadBogy(vehicle,false);
-            moveOthersBogies(vehicle,false);
+            if(!vehicle->reverse)
+            {
+                forth=false;
+            }
+            else
+            {
+                forth=true;
+            }
         }
+
+        moveHeadBogy(vehicle,forth);
+        moveOthersBogies(vehicle,forth);
     }
 
     bool FollowRails::detectOverflowSeg(const glm::vec3 pointBefore,const glm::vec3 pointAfter,const glm::vec3 posBogy,float *overflow)

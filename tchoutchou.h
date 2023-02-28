@@ -7,6 +7,8 @@
 #include "../glm/gtx/transform.hpp"
 #include "../glm/gtc/type_ptr.hpp"
 
+#define MIN_SPEED 0.005f
+
 namespace tchoutchou
 {
     struct Line
@@ -28,9 +30,10 @@ namespace tchoutchou
         std::vector<float> carsMass;        //kg
         float maxPower;                     //W
         float throttle=0.0f;                //[-1.0 , 1.0]
-        float speed=0.2f;                   //m/frame
+        float speed=0.05f;                   //m/frame
         unsigned int indexLine;
         unsigned int indexPointFirstBogy;
+        bool reverse=false;
         bool forth;
     };
 
