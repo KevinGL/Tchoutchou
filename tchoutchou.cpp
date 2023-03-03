@@ -9,7 +9,7 @@ namespace tchoutchou
         //vehicles=appVehicles;
         timeFrame=appTimeFrame;
 
-        std::cout << "- Tchoutchou : Hello I am Tchoutchou, your best physic engine for trains, tramways, metros ..." << std::endl;
+        std::cout << "- Tchoutchou : Hello I am Tchoutchou, your best physical engine for trains, tramways, metros ..." << std::endl;
 
         if(appVehicles.size()!=0 && lines.size()!=0)
         {
@@ -30,12 +30,12 @@ namespace tchoutchou
             {
                 std::cout << "- Tchoutchou : Your vehicles have been positionned on their lines :)" << std::endl;
 
-                for(unsigned int i=0;i<appVehicles[0].bogies.size();i++)
+                /*for(unsigned int i=0;i<appVehicles[0].bogies.size();i++)
                 {
                     //std::cout << appVehicles[0].bogies[i].pos.x << " " << appVehicles[0].bogies[i].pos.y << " " << appVehicles[0].bogies[i].pos.z << std::endl;
                     std::cout << appVehicles[0].bogies[i].before << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].y << ") " << appVehicles[0].bogies[i].after << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].y << ")" << std::endl;
                 }
-                std::cout << "________" << std::endl;
+                std::cout << "________" << std::endl;*/
             }
         }
 
@@ -73,7 +73,9 @@ namespace tchoutchou
 
         Bogy bogy;
 
-        bogy.pos=line.points[indexPointFirstBogy];
+        bogy.pos.x=(line.points[indexPointFirstBogy].x+line.points[indexPointFirstBogy+1].x)/2;
+        bogy.pos.y=(line.points[indexPointFirstBogy].y+line.points[indexPointFirstBogy+1].y)/2;
+        bogy.pos.z=(line.points[indexPointFirstBogy].z+line.points[indexPointFirstBogy+1].z)/2;
 
         bogy.before=indexPointFirstBogy;
         bogy.after=indexPointFirstBogy+1;

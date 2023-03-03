@@ -4,9 +4,11 @@
 
 namespace tchoutchou
 {
-    void FollowRails::moveHeadBogy(Vehicle *vehicle,const bool forth)
+    void FollowRails::moveHeadBogy(Vehicle *vehicle,bool *forth)
     {
-        if(forth)
+        vehicleCinetic(vehicle,forth);
+
+        if(*forth)
         {
             const unsigned int before=vehicle->bogies[0].before;
             const unsigned int after=vehicle->bogies[0].after;
@@ -210,7 +212,7 @@ namespace tchoutchou
 
                 const unsigned int endLoop=vehicle->bogies[i+1].after;
 
-                for(unsigned int j=0;j<endLoop;j++)
+                for(unsigned int j=vehicle->bogies[i+1].before;j<lines[vehicle->indexLine].points.size()-1;j++)
                 {
                     Demisphere demiSphere;
 
@@ -220,7 +222,7 @@ namespace tchoutchou
                     glm::vec3 pointBefore=lines[vehicle->indexLine].points[j];
                     glm::vec3 pointAfter=lines[vehicle->indexLine].points[j+1];
 
-                    demiSphere.direction=pointBefore-pointAfter;
+                    demiSphere.direction=pointAfter-pointBefore;
 
                     Segment seg;
 
@@ -251,30 +253,7 @@ namespace tchoutchou
     {
         bool forth;
 
-        if(vehicle->forth)
-        {
-            if(!vehicle->reverse)
-            {
-                forth=true;
-            }
-            else
-            {
-                forth=false;
-            }
-        }
-        else
-        {
-            if(!vehicle->reverse)
-            {
-                forth=false;
-            }
-            else
-            {
-                forth=true;
-            }
-        }
-
-        moveHeadBogy(vehicle,forth);
+        moveHeadBogy(vehicle,&forth);
         moveOthersBogies(vehicle,forth);
     }
 

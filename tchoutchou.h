@@ -27,13 +27,14 @@ namespace tchoutchou
     {
         std::vector<float> posInitBogies;
         std::vector<Bogy> bogies;
-        std::vector<float> carsMass;        //kg
-        float maxPower;                     //W
+        float mass;                         //t
+        float maxPower;                     //kW
+        float maxSpeed;                     //km/h
         float throttle=0.0f;                //[-1.0 , 1.0]
-        float speed=0.05f;                   //m/frame
+        float speed=0.0f;                   //m/frame
         unsigned int indexLine;
         unsigned int indexPointFirstBogy;
-        bool reverse=false;
+        int inverter=0;
         bool forth;
     };
 
@@ -56,12 +57,13 @@ namespace tchoutchou
 
         std::vector<Line> lines;
         //std::vector<Vehicle> vehicles;
-        unsigned int timeFrame;
+        unsigned int timeFrame;             //milliseconds
 
         bool InitVehicleBogies(Vehicle *vehicle);
         bool detectOverflowSeg(const glm::vec3 pointBefore,const glm::vec3 pointAfter,const glm::vec3 posBogy,float *overflow);
-        void moveHeadBogy(Vehicle *vehicle,const bool forth);
+        void moveHeadBogy(Vehicle *vehicle,bool *forth);
         void moveOthersBogies(Vehicle *vehicle,const bool forth);
+        void vehicleCinetic(Vehicle *vehicle,bool *forth);
 
         public :
 
