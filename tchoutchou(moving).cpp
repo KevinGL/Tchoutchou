@@ -13,8 +13,8 @@ namespace tchoutchou
             const unsigned int before=vehicle->bogies[0].before;
             const unsigned int after=vehicle->bogies[0].after;
 
-            const glm::vec3 pointBefore=lines[vehicle->indexLine].points[before];
-            const glm::vec3 pointAfter=lines[vehicle->indexLine].points[after];
+            const glm::vec3 pointBefore=ways[vehicle->indexLine].points[before];
+            const glm::vec3 pointAfter=ways[vehicle->indexLine].points[after];
 
             const float distUntilNextPoint=glm::length(pointAfter-vehicle->bogies[0].pos);
 
@@ -36,8 +36,8 @@ namespace tchoutchou
                     const unsigned int newBefore=vehicle->bogies[0].before;
                     const unsigned int newAfter=vehicle->bogies[0].after;
 
-                    const glm::vec3 newPointBefore=lines[vehicle->indexLine].points[newBefore];
-                    const glm::vec3 newPointAfter=lines[vehicle->indexLine].points[newAfter];
+                    const glm::vec3 newPointBefore=ways[vehicle->indexLine].points[newBefore];
+                    const glm::vec3 newPointAfter=ways[vehicle->indexLine].points[newAfter];
 
                     const glm::vec3 newVecMove=overflow*glm::normalize(newPointAfter-newPointBefore);
 
@@ -51,13 +51,13 @@ namespace tchoutchou
 
                 //std::cout << "Grande vitesse sens aller" << std::endl;
 
-                for(unsigned int i=after;i<lines[vehicle->indexLine].points.size()-1;i++)
+                for(unsigned int i=after;i<ways[vehicle->indexLine].points.size()-1;i++)
                 {
                     const unsigned int newBefore=i;
                     const unsigned int newAfter=i+1;
 
-                    const glm::vec3 newPointBefore=lines[vehicle->indexLine].points[newBefore];
-                    const glm::vec3 newPointAfter=lines[vehicle->indexLine].points[newAfter];
+                    const glm::vec3 newPointBefore=ways[vehicle->indexLine].points[newBefore];
+                    const glm::vec3 newPointAfter=ways[vehicle->indexLine].points[newAfter];
 
                     const float segLength=glm::length(newPointAfter-newPointBefore);
 
@@ -86,8 +86,8 @@ namespace tchoutchou
             const unsigned int before=vehicle->bogies[lastBogy].before;
             const unsigned int after=vehicle->bogies[lastBogy].after;
 
-            const glm::vec3 pointBefore=lines[vehicle->indexLine].points[before];
-            const glm::vec3 pointAfter=lines[vehicle->indexLine].points[after];
+            const glm::vec3 pointBefore=ways[vehicle->indexLine].points[before];
+            const glm::vec3 pointAfter=ways[vehicle->indexLine].points[after];
 
             const float distUntilNextPoint=glm::length(pointBefore-vehicle->bogies[lastBogy].pos);
 
@@ -111,8 +111,8 @@ namespace tchoutchou
                     const unsigned int newBefore=vehicle->bogies[lastBogy].before;
                     const unsigned int newAfter=vehicle->bogies[lastBogy].after;
 
-                    const glm::vec3 newPointBefore=lines[vehicle->indexLine].points[newBefore];
-                    const glm::vec3 newPointAfter=lines[vehicle->indexLine].points[newAfter];
+                    const glm::vec3 newPointBefore=ways[vehicle->indexLine].points[newBefore];
+                    const glm::vec3 newPointAfter=ways[vehicle->indexLine].points[newAfter];
 
                     const glm::vec3 newVecMove=overflow*glm::normalize(newPointBefore-newPointAfter);
 
@@ -131,8 +131,8 @@ namespace tchoutchou
                     const unsigned int newBefore=i-1;
                     const unsigned int newAfter=i;
 
-                    const glm::vec3 newPointBefore=lines[vehicle->indexLine].points[newBefore];
-                    const glm::vec3 newPointAfter=lines[vehicle->indexLine].points[newAfter];
+                    const glm::vec3 newPointBefore=ways[vehicle->indexLine].points[newBefore];
+                    const glm::vec3 newPointAfter=ways[vehicle->indexLine].points[newAfter];
 
                     const float segLength=glm::length(newPointAfter-newPointBefore);
 
@@ -174,8 +174,8 @@ namespace tchoutchou
                     demiSphere.center=posBogyPrev;
                     demiSphere.radius=distFromBogyPrev;
 
-                    glm::vec3 pointBefore=lines[vehicle->indexLine].points[j-1];
-                    glm::vec3 pointAfter=lines[vehicle->indexLine].points[j];
+                    glm::vec3 pointBefore=ways[vehicle->indexLine].points[j-1];
+                    glm::vec3 pointAfter=ways[vehicle->indexLine].points[j];
 
                     demiSphere.direction=pointBefore-pointAfter;
 
@@ -212,15 +212,15 @@ namespace tchoutchou
 
                 const unsigned int endLoop=vehicle->bogies[i+1].after;
 
-                for(unsigned int j=vehicle->bogies[i+1].before;j<lines[vehicle->indexLine].points.size()-1;j++)
+                for(unsigned int j=vehicle->bogies[i+1].before;j<ways[vehicle->indexLine].points.size()-1;j++)
                 {
                     Demisphere demiSphere;
 
                     demiSphere.center=posBogyNext;
                     demiSphere.radius=distFromBogyNext;
 
-                    glm::vec3 pointBefore=lines[vehicle->indexLine].points[j];
-                    glm::vec3 pointAfter=lines[vehicle->indexLine].points[j+1];
+                    glm::vec3 pointBefore=ways[vehicle->indexLine].points[j];
+                    glm::vec3 pointAfter=ways[vehicle->indexLine].points[j+1];
 
                     demiSphere.direction=pointAfter-pointBefore;
 

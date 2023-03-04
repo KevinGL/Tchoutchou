@@ -8,17 +8,24 @@ namespace tchoutchou
     void FollowRails::vehicleCinetic(Vehicle *vehicle,bool *forth)
     {
         const float maxStrength=(vehicle->maxPower*1000)/(vehicle->maxSpeed*(1000.0f/3600));        //N
+        const float maxSpeed=vehicle->maxSpeed*(1000/3600000.0f)*timeFrame;     //m/frame
 
         float strength;
 
         if(vehicle->throttle>=0.0f)
         {
-            strength=vehicle->throttle*maxStrength;     //Accelerate
+            const float strength0=vehicle->throttle*maxStrength;     //Accelerate
+
+            const float coef=-log(100.0f)/maxSpeed;
+
+            strength=strength0*exp(coef*vehicle->speed);
         }
         else
         {
             strength=2*vehicle->throttle*maxStrength;   //Brake
         }
+
+        //std::cout << (vehicle->speed/timeFrame)*3600 << " " << vehicle->maxSpeed << std::endl;
 
         const float PI=3.1415926535897932384626433832795f;
 
@@ -32,8 +39,8 @@ namespace tchoutchou
 
             const unsigned int before=vehicle->bogies[i].before;
             const unsigned int after=vehicle->bogies[i].after;
-            const glm::vec3 pointBefore=lines[vehicle->indexLine].points[before];
-            const glm::vec3 pointAfter=lines[vehicle->indexLine].points[after];
+            const glm::vec3 pointBefore=ways[vehicle->indexLine].points[before];
+            const glm::vec3 pointAfter=ways[vehicle->indexLine].points[after];
 
             const float lgSegment=glm::length(pointAfter-pointBefore);
             const float alpha=asin((pointAfter.z-pointBefore.z)/lgSegment)*180/PI;

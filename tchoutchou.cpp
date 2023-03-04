@@ -3,17 +3,17 @@
 
 namespace tchoutchou
 {
-    void FollowRails::Init(std::vector<Line> &appLines,std::vector<Vehicle> &appVehicles,const unsigned int appTimeFrame)
+    void FollowRails::Init(std::vector<Way> &appWays,std::vector<Vehicle> &appVehicles,const unsigned int appTimeFrame)
     {
-        lines=appLines;
+        ways=appWays;
         //vehicles=appVehicles;
         timeFrame=appTimeFrame;
 
         std::cout << "- Tchoutchou : Hello I am Tchoutchou, your best physical engine for trains, tramways, metros ..." << std::endl;
 
-        if(appVehicles.size()!=0 && lines.size()!=0)
+        if(appVehicles.size()!=0 && ways.size()!=0)
         {
-            std::cout << "- Tchoutchou : I am positionning your vehicles on their lines, please wait ..." << std::endl;
+            std::cout << "- Tchoutchou : I am positionning your vehicles on their ways, please wait ..." << std::endl;
 
             bool initVehicleOk=true;
 
@@ -28,12 +28,12 @@ namespace tchoutchou
 
             if(initVehicleOk)
             {
-                std::cout << "- Tchoutchou : Your vehicles have been positionned on their lines :)" << std::endl;
+                std::cout << "- Tchoutchou : Your vehicles have been positionned on their ways :)" << std::endl;
 
                 /*for(unsigned int i=0;i<appVehicles[0].bogies.size();i++)
                 {
                     //std::cout << appVehicles[0].bogies[i].pos.x << " " << appVehicles[0].bogies[i].pos.y << " " << appVehicles[0].bogies[i].pos.z << std::endl;
-                    std::cout << appVehicles[0].bogies[i].before << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].y << ") " << appVehicles[0].bogies[i].after << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].y << ")" << std::endl;
+                    std::cout << appVehicles[0].bogies[i].before << " (" << ways[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].x << " " << ways[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].before].y << ") " << appVehicles[0].bogies[i].after << " (" << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].x << " " << lines[appVehicles[0].indexLine].points[appVehicles[0].bogies[i].after].y << ")" << std::endl;
                 }
                 std::cout << "________" << std::endl;*/
             }
@@ -41,7 +41,7 @@ namespace tchoutchou
 
         else
         {
-            std::cout << "- Tchoutchou : You have not defined lines or vehicles, I can't go further, abort :(" << std::endl;
+            std::cout << "- Tchoutchou : You have not defined ways or vehicles, I can't go further, abort :(" << std::endl;
         }
     }
 
@@ -49,19 +49,19 @@ namespace tchoutchou
     {
         const unsigned int indexLine=vehicle->indexLine;
 
-        if(indexLine>lines.size()-1)
+        if(indexLine>ways.size()-1)
         {
             std::cout << "- Tchoutchou : You have an error with index of line, please check that, abort :(" << std::endl;
             return false;
         }
 
-        Line line=lines[indexLine];
+        Way way=ways[indexLine];
 
         const unsigned int indexPointFirstBogy=vehicle->indexPointFirstBogy;
 
-        if(indexPointFirstBogy>line.points.size()-1)
+        if(indexPointFirstBogy>way.points.size()-1)
         {
-            std::cout << "- Tchoutchou : You have an error with index of point of line, please check that, abort :(" << std::endl;
+            std::cout << "- Tchoutchou : You have an error with index of point of way, please check that, abort :(" << std::endl;
             return false;
         }
 
@@ -73,9 +73,9 @@ namespace tchoutchou
 
         Bogy bogy;
 
-        bogy.pos.x=(line.points[indexPointFirstBogy].x+line.points[indexPointFirstBogy+1].x)/2;
-        bogy.pos.y=(line.points[indexPointFirstBogy].y+line.points[indexPointFirstBogy+1].y)/2;
-        bogy.pos.z=(line.points[indexPointFirstBogy].z+line.points[indexPointFirstBogy+1].z)/2;
+        bogy.pos.x=(way.points[indexPointFirstBogy].x+way.points[indexPointFirstBogy+1].x)/2;
+        bogy.pos.y=(way.points[indexPointFirstBogy].y+way.points[indexPointFirstBogy+1].y)/2;
+        bogy.pos.z=(way.points[indexPointFirstBogy].z+way.points[indexPointFirstBogy+1].z)/2;
 
         bogy.before=indexPointFirstBogy;
         bogy.after=indexPointFirstBogy+1;
@@ -94,7 +94,7 @@ namespace tchoutchou
 
             std::vector<glm::vec3> inters;
 
-            demiSphere.direction=line.points[indexPointPrev-1]-line.points[indexPointPrev];
+            demiSphere.direction=way.points[indexPointPrev-1]-way.points[indexPointPrev];
 
             //std::cout << "Direction demi-sphere : " << demiSphere.direction.x << " " << demiSphere.direction.y << " " << demiSphere.direction.z << std::endl;
 
@@ -102,8 +102,8 @@ namespace tchoutchou
             {
                 Segment seg;
 
-                seg.v1=line.points[j];
-                seg.v2=line.points[j-1];
+                seg.v1=way.points[j];
+                seg.v2=way.points[j-1];
 
                 betweenDemisphereSegment(&demiSphere,&seg,inters);
 

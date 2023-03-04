@@ -11,7 +11,7 @@
 
 namespace tchoutchou
 {
-    struct Line
+    struct Way
     {
         std::vector<glm::vec3> points;
     };
@@ -23,10 +23,18 @@ namespace tchoutchou
         unsigned int after;
     };
 
+    struct Car
+    {
+        float interval[2];
+        glm::vec3 pos;
+        float angle;
+    };
+
     struct Vehicle
     {
         std::vector<float> posInitBogies;
         std::vector<Bogy> bogies;
+        std::vector<Car> cars;
         float mass;                         //t
         float maxPower;                     //kW
         float maxSpeed;                     //km/h
@@ -55,7 +63,7 @@ namespace tchoutchou
     {
         private :
 
-        std::vector<Line> lines;
+        std::vector<Way> ways;
         //std::vector<Vehicle> vehicles;
         unsigned int timeFrame;             //milliseconds
 
@@ -67,7 +75,7 @@ namespace tchoutchou
 
         public :
 
-        void Init(std::vector<Line> &appLines,std::vector<Vehicle> &appVehicles,const unsigned int appTimeFrame);
+        void Init(std::vector<Way> &appWays,std::vector<Vehicle> &appVehicles,const unsigned int appTimeFrame);
         void moveVehicle(Vehicle *vehicle);
     };
 
