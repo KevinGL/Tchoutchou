@@ -40,7 +40,7 @@ namespace tchoutchou
         float maxSpeed;                     //km/h
         float throttle=0.0f;                //[-1.0 , 1.0]
         float speed=0.0f;                   //m/frame
-        unsigned int indexLine;
+        unsigned int indexWay;
         unsigned int indexPointFirstBogy;
         int inverter=0;
         bool forth;
