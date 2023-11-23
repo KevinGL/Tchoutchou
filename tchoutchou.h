@@ -30,12 +30,25 @@ namespace tch
         int indexBefore = -1;
     };
 
-    class World
+    struct SemiSphere
+    {
+        glm::vec3 center;
+        float radius;
+        glm::vec3 dir;
+    };
+
+    struct Segment
+    {
+        glm::vec3 p1;
+        glm::vec3 p2;
+    };
+
+    class Network
     {
         private :
 
         std::vector<Point> points;
-        std::vector<Vehicle> vehicles;
+        //std::vector<Vehicle> vehicles;
 
         public :
 
@@ -49,6 +62,14 @@ namespace tch
             points = array;
         }
 
-        void addVehicle(std::vector<float> posBogies, const size_t indexPoint);
+        void addVehicle(Vehicle *vehicle, const size_t indexPoint);
+        void commandVehicle(Vehicle *vehicle, const float weight, const float maxSpeed, const float traction);
+
+        /*Vehicle* getVehicle(const size_t index)
+        {
+            return (index < vehicles.size() ? &vehicles[index] : nullptr);
+        }*/
     };
+
+    bool interSemiSphereSeg(SemiSphere sph, Segment seg, glm::vec3 &inter);
 }

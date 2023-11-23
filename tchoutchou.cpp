@@ -3,19 +3,38 @@
 
 namespace tch
 {
-    void World::addVehicle(std::vector<float> posBogies, const size_t indexPoint)
+    void Network::addVehicle(Vehicle *vehicle, const size_t indexPoint)
     {
-        Vehicle v;
+        vehicle->bogies[0].pos = points[indexPoint].pos;
 
-        for(float p : posBogies)
+        size_t indexPointBogyPrev = indexPoint;
+
+        for(size_t i=1; i<vehicle->bogies.size(); i++)
         {
-            Bogy b;
+            SemiSphere s;
 
-            b.posInit = p;
+            s.center = vehicle->bogies[i-1].pos;
+            s.radius = fabs(vehicle->bogies[i].posInit - vehicle->bogies[i-1].posInit);
 
-            v.bogies.push_back(b);
+            const size_t before = points[indexPointBogyPrev].indexBefore;
+            s.dir = glm::normalize(points[before].pos - points[indexPointBogyPrev].pos);
+
+            glm::vec3 inter;
+
+            for(size_t j=0; j<points.size()-1; j++)
+            {
+                Segment seg;
+
+                seg.p1 = points[j].pos;
+                seg.p2 = points[j+1].pos;
+
+                if(interSemiSphereSeg(s, seg, inter))
+                {
+                    indexPointBogyPrev = j;
+                    vehicle->bogies[i].pos = inter;
+                    break;
+                }
+            }
         }
-
-        vehicles.push_back(v);
     }
 }
