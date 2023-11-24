@@ -50,26 +50,92 @@ namespace tch
 
         const float speedKmh = (vehicle->speed / frameTime) * 3600;
 
+        float tractionStrength;
         const float beta = log(0.01f) / maxSpeed;
-        float engineStrength = traction * maxStrength * exp(beta * speedKmh);
+
+        if(traction >= 0.0f)
+        {
+            tractionStrength = traction * maxStrength * exp(beta * speedKmh);
+        }
+        else
+        {
+            tractionStrength = -10.0f * maxStrength;
+        }
 
         if(inverter == 0)               //Neutre
         {
-            engineStrength = 0.0f;
+            tractionStrength = 0.0f;
         }
+
+        const bool wayDirection = isWayDirection(reverse, inverter);        //Dans le sens de la voie ou non selon itinéraire et inverseur
+
+        if(!wayDirection)
+        {
+            tractionStrength *= -1;
+        }
+
+        accel += tractionStrength / weight;
+
+        float acceleration = accel;
+
+        acceleration /= 1000;           //m/s/ms
+        acceleration *= frameTime;      //m/s/frame
+        acceleration /= 1000;           //m/ms2
+        acceleration *= frameTime;      //m/frame2
+
+        vehicle->speed += acceleration;
+
+        if(traction < 0.0f)             //Freinage
+        {
+            if(wayDirection && vehicle->speed < 0.0f)
+            {
+                vehicle->speed = 0.0f;
+            }
+            else
+            if(!wayDirection && vehicle->speed > 0.0f)
+            {
+                vehicle->speed = 0.0f;
+            }
+        }
+
+        //std::cout << (vehicle->speed / frameTime) * 3600 << " km/h" << std::endl;
+
+        //std::cout << "Inverter : " << inverter << " traction : " << traction << " strength (N) : " << tractionStrength << " acceleration (m/s2) : " << accel << std::endl;
+        //std::cout << "Inverter : " << inverter << " traction : " << traction << " sensway : " << wayDirection << " strength (N) : " << tractionStrength << " accel (m/s2) : " << accel << " speed (km/h) : " << (vehicle->speed / frameTime) * 3600 << std::endl;
+    }
+
+    bool isWayDirection(const bool reverse, const int inverter)
+    {
+        bool res;
+
+        if(!reverse)
+        {
+            if(inverter == 1)
+            {
+                res = true;
+            }
+
+            else
+            if(inverter == -1)
+            {
+                res = false;
+            }
+        }
+
         else
-        if(inverter == -1)              //Marche arrière
         {
-            engineStrength *= -1;
+            if(inverter == 1)
+            {
+                res = false;
+            }
+
+            else
+            if(inverter == -1)
+            {
+                res = true;
+            }
         }
 
-        if(reverse)                     //Sens retour
-        {
-            engineStrength *= -1;
-        }
-
-        accel += engineStrength / weight;
-
-        //std::cout << "Inverter : " << inverter << " traction : " << traction << " strength (N) : " << engineStrength << " acceleration (m/s2) : " << accel << std::endl;
+        return res;
     }
 }

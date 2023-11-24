@@ -75,4 +75,5 @@ namespace tch
     };
 
     bool interSemiSphereSeg(SemiSphere sph, Segment seg, glm::vec3 &inter);
+    bool isWayDirection(const bool reverse, const int inverter);
 }
