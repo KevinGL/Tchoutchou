@@ -8,6 +8,7 @@
 #include "../glm/gtc/type_ptr.hpp"
 
 #define MIN_SPEED 0.005f
+#define PI 3.1415926535897932384626433832795
 
 namespace tch
 {
@@ -15,12 +16,14 @@ namespace tch
     {
         float posInit;
         glm::vec3 pos;
-        float angle;
+        size_t indexBefore;
+        size_t indexAfter;
     };
 
     struct Vehicle
     {
         std::vector<Bogy> bogies;
+        float speed = 0.0f;
     };
 
     struct Point
@@ -48,6 +51,7 @@ namespace tch
         private :
 
         std::vector<Point> points;
+        unsigned int frameTime;
         //std::vector<Vehicle> vehicles;
 
         public :
@@ -63,12 +67,11 @@ namespace tch
         }
 
         void addVehicle(Vehicle *vehicle, const size_t indexPoint);
-        void commandVehicle(Vehicle *vehicle, const float weight, const float maxSpeed, const float traction);
-
-        /*Vehicle* getVehicle(const size_t index)
+        void commandVehicle(Vehicle *vehicle, const float weight, const float maxSpeed, const float maxStrength, const float traction, const int inverter, const bool reverse);
+        Network(const unsigned int fTime)
         {
-            return (index < vehicles.size() ? &vehicles[index] : nullptr);
-        }*/
+            frameTime = fTime;
+        }
     };
 
     bool interSemiSphereSeg(SemiSphere sph, Segment seg, glm::vec3 &inter);

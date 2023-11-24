@@ -6,6 +6,8 @@ namespace tch
     void Network::addVehicle(Vehicle *vehicle, const size_t indexPoint)
     {
         vehicle->bogies[0].pos = points[indexPoint].pos;
+        vehicle->bogies[0].indexBefore = indexPoint;
+        vehicle->bogies[0].indexAfter = points[indexPoint].indexAfter;
 
         size_t indexPointBogyPrev = indexPoint;
 
@@ -26,12 +28,14 @@ namespace tch
                 Segment seg;
 
                 seg.p1 = points[j].pos;
-                seg.p2 = points[j+1].pos;
+                seg.p2 = points[points[j].indexAfter].pos;
 
                 if(interSemiSphereSeg(s, seg, inter))
                 {
                     indexPointBogyPrev = j;
                     vehicle->bogies[i].pos = inter;
+                    vehicle->bogies[i].indexBefore = j;
+                    vehicle->bogies[i].indexAfter = points[j].indexAfter;
                     break;
                 }
             }
