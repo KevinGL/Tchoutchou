@@ -1,42 +1,143 @@
 #include "tchoutchou.h"
 #include <iostream>
+#include <fstream>
 
 namespace tch
 {
-    void Network::addVehicle(Vehicle *vehicle, const size_t indexPoint)
+    void Network::LoadNetwork(const std::string path)
     {
-        vehicle->bogies[0].pos = points[indexPoint].pos;
-        vehicle->bogies[0].indexBefore = indexPoint;
-        vehicle->bogies[0].indexAfter = points[indexPoint].indexAfter;
+        std::ifstream file(path);
 
-        size_t indexPointBogyPrev = indexPoint;
-
-        for(size_t i=1; i<vehicle->bogies.size(); i++)
+        while(1)
         {
-            SemiSphere s;
+            std::string line;
 
-            s.center = vehicle->bogies[i-1].pos;
-            s.radius = fabs(vehicle->bogies[i].posInit - vehicle->bogies[i-1].posInit);
-
-            const size_t before = points[indexPointBogyPrev].indexBefore;
-            s.dir = glm::normalize(points[before].pos - points[indexPointBogyPrev].pos);
-
-            glm::vec3 inter;
-
-            for(size_t j=0; j<points.size()-1; j++)
+            if(!getline(file, line))
             {
-                Segment seg;
+                break;
+            }
 
-                seg.p1 = points[j].pos;
-                seg.p2 = points[points[j].indexAfter].pos;
+            if(line.find("v ") == 0)
+            {
+                Point p;
 
-                if(interSemiSphereSeg(s, seg, inter))
+                sscanf(line.c_str(), "v %f %f %f\n", &p.pos.x, &p.pos.y, &p.pos.z);
+
+                points.push_back(p);
+            }
+
+            else
+            if(line.find("l ") == 0)
+            {
+                size_t index1, index2;
+
+                sscanf(line.c_str(), "l %d %d\n", &index1, &index2);
+
+                index1--;
+                index2--;
+
+                if(index1 < index2)
                 {
-                    indexPointBogyPrev = j;
-                    vehicle->bogies[i].pos = inter;
-                    vehicle->bogies[i].indexBefore = j;
-                    vehicle->bogies[i].indexAfter = points[j].indexAfter;
-                    break;
+                    points[index1].indexAfter.push_back(index2);
+                    points[index2].indexBefore.push_back(index1);
+                }
+
+                else
+                {
+                    points[index2].indexAfter.push_back(index1);
+                    points[index1].indexBefore.push_back(index2);
+                }
+            }
+        }
+
+        file.close();
+    }
+
+    void Network::addVehicle(Vehicle *vehicle, size_t indexPoint)
+    {
+        const glm::vec3 posNode = points[indexPoint].pos;
+
+        vehicle->bogies[0].pos = posNode;
+        vehicle->bogies[0].indexBefore = indexPoint;
+        const size_t switchAfter = points[indexPoint].switchAfter;
+        const size_t indexAfter = points[indexPoint].indexAfter[switchAfter];
+        vehicle->bogies[0].indexAfter = indexAfter;
+
+        calculAngles(points[indexPoint].pos, points[indexAfter].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+
+        posNextBogies(vehicle, indexPoint, indexAfter, false);
+
+        /*for(const Bogy b : vehicle->bogies)
+        {
+            std::cout << "(" << b.pos.x << " " << b.pos.y << ") " << b.indexBefore << " " << b.indexAfter << std::endl;
+        }*/
+    }
+
+    void Network::posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter, const bool reverse)
+    {
+        if(!reverse)
+        {
+            for(size_t i=1; i<vehicle->bogies.size(); i++)
+            {
+                SemiSphere ssphere;
+
+                ssphere.radius = fabs(vehicle->bogies[i].posInit - vehicle->bogies[i-1].posInit);
+                ssphere.center = vehicle->bogies[i-1].pos;
+                const size_t indexBefore = points[indexPoint].indexBefore[points[indexPoint].switchBefore];
+                ssphere.dir = points[indexBefore].pos - points[indexPoint].pos;
+
+                size_t indexAf = indexPoint;
+                size_t switchBe = points[indexAf].switchBefore;
+
+                //std::cout << "Bogie " << i << " :" << std::endl << std::endl;
+
+                if(points[indexAf].indexBefore.size() != 0)
+                {
+                    size_t indexBe = points[indexAf].indexBefore[switchBe];
+
+                    while(1)
+                    {
+                        Segment seg;
+
+                        seg.p1 = points[indexBe].pos;
+                        seg.p2 = points[indexAf].pos;
+
+                        //std::cout << indexBe << " (" << points[indexBe].pos.x << " " << points[indexBe].pos.y << ") - " << indexAf << " (" << points[indexAf].pos.x << " " << points[indexAf].pos.y << ")" << std::endl;
+
+                        if(interSemiSphereSeg(ssphere, seg, vehicle->bogies[i].pos))
+                        {
+                            vehicle->bogies[i].indexBefore = indexBe;
+                            vehicle->bogies[i].indexAfter = indexAf;
+
+                            calculAngles(points[indexBe].pos, points[indexAf].pos, &vehicle->bogies[i].angleZ, &vehicle->bogies[i].angleY);
+
+                            indexPoint = indexAfter;
+                            const size_t switchAfter = points[indexPoint].switchAfter;
+                            indexAfter = points[indexPoint].indexAfter[switchAfter];
+
+                            break;
+                        }
+
+                        indexAf = indexBe;
+                        switchBe = points[indexAf].switchBefore;
+
+                        if(points[indexAf].indexBefore.size() != 0)
+                        {
+                            indexBe = points[indexAf].indexBefore[switchBe];
+                        }
+
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                else
+                {
+                    std::cout << "Tchoutchou : Error : Out of way !" << std::endl;
+
+                    exit(-1);
                 }
             }
         }

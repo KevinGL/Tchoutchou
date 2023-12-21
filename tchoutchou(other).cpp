@@ -131,4 +131,19 @@ namespace tch
 
         return res;
     }
+
+    void calculAngles(const glm::vec3 p1, const glm::vec3 p2, float *angleZ, float *angleY)
+    {
+        const glm::vec3 vecSeg = glm::normalize(p2 - p1);
+        const glm::vec3 vecSegProj = glm::vec3(vecSeg.x, vecSeg.y, 0.0f);
+
+        *angleZ = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), vecSeg)) * 180/PI;
+
+        if(vecSeg.y < 0)
+        {
+            *angleZ *= -1;
+        }
+
+        *angleY = atan(vecSeg.z / glm::length(vecSegProj)) * 180/PI;
+    }
 }

@@ -102,6 +102,8 @@ namespace tch
 
         //std::cout << "Inverter : " << inverter << " traction : " << traction << " strength (N) : " << tractionStrength << " acceleration (m/s2) : " << accel << std::endl;
         //std::cout << "Inverter : " << inverter << " traction : " << traction << " sensway : " << wayDirection << " strength (N) : " << tractionStrength << " accel (m/s2) : " << accel << " speed (km/h) : " << (vehicle->speed / frameTime) * 3600 << std::endl;
+
+        movingVehicle(vehicle);
     }
 
     bool isWayDirection(const bool reverse, const int inverter)

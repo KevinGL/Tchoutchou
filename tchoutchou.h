@@ -3,6 +3,8 @@
 #endif // TCHOUTCHOU_H
 
 #include <vector>
+#include <string>
+#include <map>
 #include "../glm/glm.hpp"
 #include "../glm/gtx/transform.hpp"
 #include "../glm/gtc/type_ptr.hpp"
@@ -16,21 +18,26 @@ namespace tch
     {
         float posInit;
         glm::vec3 pos;
-        size_t indexBefore;
-        size_t indexAfter;
+        float angleZ;
+        float angleY;
+        int indexBefore;
+        int indexAfter;
     };
 
     struct Vehicle
     {
         std::vector<Bogy> bogies;
         float speed = 0.0f;
+        int declivity;
     };
 
     struct Point
     {
         glm::vec3 pos;
-        int indexAfter = -1;
-        int indexBefore = -1;
+        std::vector<size_t> indexAfter;
+        std::vector<size_t> indexBefore;
+        size_t switchAfter = 0;
+        size_t switchBefore = 0;
     };
 
     struct SemiSphere
@@ -54,6 +61,9 @@ namespace tch
         unsigned int frameTime;
         //std::vector<Vehicle> vehicles;
 
+        void movingVehicle(Vehicle *vehicle);
+        void posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter, const bool reverse);
+
         public :
 
         void addPoint(Point p)
@@ -66,14 +76,16 @@ namespace tch
             points = array;
         }
 
-        void addVehicle(Vehicle *vehicle, const size_t indexPoint);
+        void LoadNetwork(const std::string path);
+        void addVehicle(Vehicle *vehicle, size_t indexPoint);
         void commandVehicle(Vehicle *vehicle, const float weight, const float maxSpeed, const float maxStrength, const float traction, const int inverter, const bool reverse);
         Network(const unsigned int fTime)
         {
             frameTime = fTime;
-        }
+        };
     };
 
     bool interSemiSphereSeg(SemiSphere sph, Segment seg, glm::vec3 &inter);
     bool isWayDirection(const bool reverse, const int inverter);
+    void calculAngles(const glm::vec3 p1, const glm::vec3 p2, float *angleZ, float *angleY);
 }
