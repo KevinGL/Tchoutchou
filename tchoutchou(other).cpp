@@ -146,4 +146,47 @@ namespace tch
 
         *angleY = atan(vecSeg.z / glm::length(vecSegProj)) * 180/PI;
     }
+
+    bool crossed(const glm::vec3 bogyPos, const glm::vec3 before, const glm::vec3 after)
+    {
+        glm::vec3 middle = before + after;
+        middle /= 2;
+
+        const float lg = glm::length(after - before);
+
+        if(glm::length(bogyPos - middle) > lg/2)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    void Network::recalculateBeAf(const glm::vec3 bogyPos, int *indexBe, int *indexAf)
+    {
+        for(size_t i=0; i<points.size(); i++)
+        {
+            const Point p1 = points[i];
+
+            if(p1.indexAfter.size() != 0)
+            {
+                const size_t switchAfter = p1.switchAfter;
+                const Point p2 = points[p1.indexAfter[switchAfter]];
+
+                glm::vec3 middle = p1.pos + p2.pos;
+                middle /= 2;
+
+                const float lg = glm::length(p2.pos - p1.pos);
+
+                const glm::vec3 vecP1P2 = glm::normalize(p2.pos - p1.pos);
+                const glm::vec3 vecP1Bogy = glm::normalize(bogyPos - p1.pos);
+
+                if(glm::dot(vecP1P2, vecP1Bogy) >= 0.9f && glm::length(bogyPos - middle) <= lg/2)
+                {
+                    *indexBe = i;
+                    *indexAf = p1.indexAfter[switchAfter];
+                }
+            }
+        }
+    }
 }

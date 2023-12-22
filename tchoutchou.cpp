@@ -65,7 +65,7 @@ namespace tch
 
         calculAngles(points[indexPoint].pos, points[indexAfter].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
 
-        posNextBogies(vehicle, indexPoint, indexAfter, false);
+        posNextBogies(vehicle, indexPoint, indexAfter);
 
         /*for(const Bogy b : vehicle->bogies)
         {
@@ -73,72 +73,69 @@ namespace tch
         }*/
     }
 
-    void Network::posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter, const bool reverse)
+    void Network::posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter)
     {
-        if(!reverse)
+        for(size_t i=1; i<vehicle->bogies.size(); i++)
         {
-            for(size_t i=1; i<vehicle->bogies.size(); i++)
+            SemiSphere ssphere;
+
+            ssphere.radius = fabs(vehicle->bogies[i].posInit - vehicle->bogies[i-1].posInit);
+            ssphere.center = vehicle->bogies[i-1].pos;
+            const size_t indexBefore = points[indexPoint].indexBefore[points[indexPoint].switchBefore];
+            ssphere.dir = points[indexBefore].pos - points[indexPoint].pos;
+
+            size_t indexAf = indexPoint;
+            size_t switchBe = points[indexAf].switchBefore;
+
+            //std::cout << "Bogie " << i << " :" << std::endl << std::endl;
+
+            if(points[indexAf].indexBefore.size() != 0)
             {
-                SemiSphere ssphere;
+                size_t indexBe = points[indexAf].indexBefore[switchBe];
 
-                ssphere.radius = fabs(vehicle->bogies[i].posInit - vehicle->bogies[i-1].posInit);
-                ssphere.center = vehicle->bogies[i-1].pos;
-                const size_t indexBefore = points[indexPoint].indexBefore[points[indexPoint].switchBefore];
-                ssphere.dir = points[indexBefore].pos - points[indexPoint].pos;
-
-                size_t indexAf = indexPoint;
-                size_t switchBe = points[indexAf].switchBefore;
-
-                //std::cout << "Bogie " << i << " :" << std::endl << std::endl;
-
-                if(points[indexAf].indexBefore.size() != 0)
+                while(1)
                 {
-                    size_t indexBe = points[indexAf].indexBefore[switchBe];
+                    Segment seg;
 
-                    while(1)
+                    seg.p1 = points[indexBe].pos;
+                    seg.p2 = points[indexAf].pos;
+
+                    //std::cout << indexBe << " (" << points[indexBe].pos.x << " " << points[indexBe].pos.y << ") - " << indexAf << " (" << points[indexAf].pos.x << " " << points[indexAf].pos.y << ")" << std::endl;
+
+                    if(interSemiSphereSeg(ssphere, seg, vehicle->bogies[i].pos))
                     {
-                        Segment seg;
+                        vehicle->bogies[i].indexBefore = indexBe;
+                        vehicle->bogies[i].indexAfter = indexAf;
 
-                        seg.p1 = points[indexBe].pos;
-                        seg.p2 = points[indexAf].pos;
+                        calculAngles(points[indexBe].pos, points[indexAf].pos, &vehicle->bogies[i].angleZ, &vehicle->bogies[i].angleY);
 
-                        //std::cout << indexBe << " (" << points[indexBe].pos.x << " " << points[indexBe].pos.y << ") - " << indexAf << " (" << points[indexAf].pos.x << " " << points[indexAf].pos.y << ")" << std::endl;
+                        indexPoint = indexAfter;
+                        const size_t switchAfter = points[indexPoint].switchAfter;
+                        indexAfter = points[indexPoint].indexAfter[switchAfter];
 
-                        if(interSemiSphereSeg(ssphere, seg, vehicle->bogies[i].pos))
-                        {
-                            vehicle->bogies[i].indexBefore = indexBe;
-                            vehicle->bogies[i].indexAfter = indexAf;
+                        break;
+                    }
 
-                            calculAngles(points[indexBe].pos, points[indexAf].pos, &vehicle->bogies[i].angleZ, &vehicle->bogies[i].angleY);
+                    indexAf = indexBe;
+                    switchBe = points[indexAf].switchBefore;
 
-                            indexPoint = indexAfter;
-                            const size_t switchAfter = points[indexPoint].switchAfter;
-                            indexAfter = points[indexPoint].indexAfter[switchAfter];
+                    if(points[indexAf].indexBefore.size() != 0)
+                    {
+                        indexBe = points[indexAf].indexBefore[switchBe];
+                    }
 
-                            break;
-                        }
-
-                        indexAf = indexBe;
-                        switchBe = points[indexAf].switchBefore;
-
-                        if(points[indexAf].indexBefore.size() != 0)
-                        {
-                            indexBe = points[indexAf].indexBefore[switchBe];
-                        }
-
-                        else
-                        {
-                            break;
-                        }
+                    else
+                    {
+                        break;
                     }
                 }
+            }
 
-                else
-                {
-                    std::cout << "Tchoutchou : Error : Out of way !" << std::endl;
+            else
+            {
+                std::cout << "Tchoutchou : Error : Out of way !" << std::endl;
 
-                    exit(-1);
-                }
+                exit(-1);
             }
         }
     }

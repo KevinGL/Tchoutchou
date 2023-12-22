@@ -62,7 +62,8 @@ namespace tch
         //std::vector<Vehicle> vehicles;
 
         void movingVehicle(Vehicle *vehicle);
-        void posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter, const bool reverse);
+        void posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter);
+        void recalculateBeAf(const glm::vec3 bogyPos, int *indexBe, int *indexAf);
 
         public :
 
@@ -88,4 +89,5 @@ namespace tch
     bool interSemiSphereSeg(SemiSphere sph, Segment seg, glm::vec3 &inter);
     bool isWayDirection(const bool reverse, const int inverter);
     void calculAngles(const glm::vec3 p1, const glm::vec3 p2, float *angleZ, float *angleY);
+    bool crossed(const glm::vec3 bogyPos, const glm::vec3 before, const glm::vec3 after);
 }

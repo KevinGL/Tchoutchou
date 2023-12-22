@@ -48,7 +48,7 @@ namespace tch
             accel = 0.0f;
         }
 
-        const float speedKmh = (vehicle->speed / frameTime) * 3600;
+        const float speedKmh = (fabs(vehicle->speed) / frameTime) * 3600;
 
         float tractionStrength;
         const float beta = log(0.01f) / maxSpeed;
