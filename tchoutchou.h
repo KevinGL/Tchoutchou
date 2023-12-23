@@ -29,6 +29,7 @@ namespace tch
         std::vector<Bogy> bogies;
         float speed = 0.0f;
         int declivity;
+        bool isTramway;
     };
 
     struct Point
@@ -64,6 +65,8 @@ namespace tch
         void movingVehicle(Vehicle *vehicle);
         void posNextBogies(Vehicle *vehicle, size_t indexPoint, size_t indexAfter);
         void recalculateBeAf(const glm::vec3 bogyPos, int *indexBe, int *indexAf);
+        //void calculAngles(const Point p1, const Point p2, const glm::vec3 posBogy, float *angleZ, float *angleY);
+        void calculAngles(const bool isTramway, const Point p1, const Point p2, std::vector<Bogy> &bogies, size_t indexBogy);
 
         public :
 
@@ -88,6 +91,5 @@ namespace tch
 
     bool interSemiSphereSeg(SemiSphere sph, Segment seg, glm::vec3 &inter);
     bool isWayDirection(const bool reverse, const int inverter);
-    void calculAngles(const glm::vec3 p1, const glm::vec3 p2, float *angleZ, float *angleY);
     bool crossed(const glm::vec3 bogyPos, const glm::vec3 before, const glm::vec3 after);
 }

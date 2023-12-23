@@ -132,19 +132,118 @@ namespace tch
         return res;
     }
 
-    void calculAngles(const glm::vec3 p1, const glm::vec3 p2, float *angleZ, float *angleY)
+    //void Network::calculAngles(const Point p1, const Point p2, const glm::vec3 posBogy, float *angleZ, float *angleY)
+    void Network::calculAngles(const bool isTramway, const Point p1, const Point p2, std::vector<Bogy> &bogies, size_t indexBogy)
     {
-        const glm::vec3 vecSeg = glm::normalize(p2 - p1);
+        /*const glm::vec3 vecSeg = glm::normalize(p2.pos - p1.pos);
         const glm::vec3 vecSegProj = glm::vec3(vecSeg.x, vecSeg.y, 0.0f);
 
         *angleZ = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), vecSeg)) * 180/PI;
 
-        if(vecSeg.y < 0)
+        if(vecSeg.y > 0)
         {
             *angleZ *= -1;
         }
 
-        *angleY = atan(vecSeg.z / glm::length(vecSegProj)) * 180/PI;
+        *angleY = atan(vecSeg.z / glm::length(vecSegProj)) * 180/PI;*/
+
+        if(isTramway)
+        {
+            const glm::vec3 pos2 = p1.pos;
+            const glm::vec3 pos3 = p2.pos;
+            glm::vec3 pos1, pos4;
+
+            const glm::vec3 vecSeg2 = glm::normalize(pos3 - pos2);
+            const glm::vec3 vecSegProj2 = glm::vec3(vecSeg2.x, vecSeg2.y, 0.0f);
+
+            if(p1.indexBefore.size() != 0)
+            {
+                pos1 = points[p1.indexBefore[p1.switchBefore]].pos;
+            }
+            else
+            {
+                pos1 = pos2 - vecSeg2;
+            }
+
+            if(p2.indexAfter.size() != 0)
+            {
+                pos4 = points[p2.indexAfter[p2.switchAfter]].pos;
+            }
+            else
+            {
+                pos4 = pos3 + vecSeg2;
+            }
+
+            const glm::vec3 vecSeg1 = glm::normalize(pos2 - pos1);
+            const glm::vec3 vecSegProj1 = glm::vec3(vecSeg1.x, vecSeg1.y, 0.0f);
+
+            const glm::vec3 vecSeg3 = glm::normalize(pos4 - pos3);
+            const glm::vec3 vecSegProj3 = glm::vec3(vecSeg3.x, vecSeg3.y, 0.0f);
+
+            ///////////////////////////////////////////////////////////////////////////////
+
+            float alphaZ = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), vecSeg1)) * 180/PI;
+
+            if(vecSeg1.y > 0)
+            {
+                alphaZ *= -1;
+            }
+
+            const float alphaY = atan(vecSeg1.z / glm::length(vecSegProj1)) * 180/PI;
+
+            ///////////////////////////////////////////////////////////////////////////////
+
+            float betaZ = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), vecSeg2)) * 180/PI;
+
+            if(vecSeg2.y > 0)
+            {
+                betaZ *= -1;
+            }
+
+            const float betaY = atan(vecSeg2.z / glm::length(vecSegProj2)) * 180/PI;
+
+            ///////////////////////////////////////////////////////////////////////////////
+
+            float gammaZ = acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), vecSeg3)) * 180/PI;
+
+            if(vecSeg3.y > 0)
+            {
+                gammaZ *= -1;
+            }
+
+            const float gammaY = atan(vecSeg3.z / glm::length(vecSegProj3)) * 180/PI;
+
+            ///////////////////////////////////////////////////////////////////////////////
+
+            const float thetaZ = (alphaZ + betaZ) / 2;
+            const float thetaY = (alphaY + betaY) / 2;
+
+            const float deltaZ = (betaZ + gammaZ) / 2;
+            const float deltaY = (betaY + gammaY) / 2;
+
+            ///////////////////////////////////////////////////////////////////////////////
+
+            const float lgSeg = glm::length(pos3 - pos2);
+            const float dist = glm::length(bogies[indexBogy].pos - pos2);
+
+            float coef = (deltaZ - thetaZ) / lgSeg;
+            bogies[indexBogy].angleZ = coef * dist + thetaZ;
+
+            coef = (deltaY - thetaY) / lgSeg;
+            bogies[indexBogy].angleY = coef * dist + thetaY;
+
+            ///////////////////////////////////////////////////////////////////////////////
+
+            /*if(indexBogy == 0)
+            {
+                std::cout << "(" << thetaZ << " " << deltaZ << ") " << dist << " / " << lgSeg << " => " << bogies[indexBogy].angleZ << std::endl;
+            }*/
+        }
+
+        else
+        {
+            //
+        }
     }
 
     bool crossed(const glm::vec3 bogyPos, const glm::vec3 before, const glm::vec3 after)

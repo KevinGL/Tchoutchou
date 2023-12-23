@@ -19,7 +19,8 @@ namespace tch
             {
                 vehicle->bogies[0].pos += speed * glm::normalize(afterPoint.pos - beforePoint.pos);
 
-                calculAngles(beforePoint.pos, afterPoint.pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                //calculAngles(beforePoint, afterPoint, vehicle->bogies[0].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                calculAngles(vehicle->isTramway, beforePoint, afterPoint, vehicle->bogies, 0);
 
                 if(crossed(vehicle->bogies[0].pos, beforePoint.pos, afterPoint.pos))
                 {
@@ -65,7 +66,8 @@ namespace tch
                 const size_t indexAfter = beforePoint.indexAfter[switchAfter];
                 const Point afterPoint = points[indexAfter];
 
-                calculAngles(beforePoint.pos, afterPoint.pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                //calculAngles(beforePoint, afterPoint, vehicle->bogies[0].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                calculAngles(vehicle->isTramway, beforePoint, afterPoint, vehicle->bogies, 0);
             }
 
             const size_t beforeForNext = vehicle->bogies[0].indexAfter;
@@ -87,7 +89,8 @@ namespace tch
             {
                 vehicle->bogies[0].pos += speed * glm::normalize(beforePoint.pos - afterPoint.pos);
 
-                calculAngles(beforePoint.pos, afterPoint.pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                //calculAngles(beforePoint, afterPoint, vehicle->bogies[0].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                calculAngles(vehicle->isTramway, beforePoint, afterPoint, vehicle->bogies, 0);
 
                 if(crossed(vehicle->bogies[0].pos, beforePoint.pos, afterPoint.pos))
                 {
@@ -133,7 +136,8 @@ namespace tch
                 const size_t indexAfter = beforePoint.indexAfter[switchAfter];
                 const Point afterPoint = points[indexAfter];
 
-                calculAngles(beforePoint.pos, afterPoint.pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                //calculAngles(beforePoint, afterPoint, vehicle->bogies[0].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+                calculAngles(vehicle->isTramway, beforePoint, afterPoint, vehicle->bogies, 0);
             }
 
             const size_t beforeForNext = vehicle->bogies[0].indexAfter;

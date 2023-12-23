@@ -63,7 +63,8 @@ namespace tch
         const size_t indexAfter = points[indexPoint].indexAfter[switchAfter];
         vehicle->bogies[0].indexAfter = indexAfter;
 
-        calculAngles(points[indexPoint].pos, points[indexAfter].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+        //calculAngles(points[indexPoint], points[indexAfter], vehicle->bogies[0].pos, &vehicle->bogies[0].angleZ, &vehicle->bogies[0].angleY);
+        calculAngles(vehicle->isTramway, points[indexPoint], points[indexAfter], vehicle->bogies, 0);
 
         posNextBogies(vehicle, indexPoint, indexAfter);
 
@@ -107,7 +108,8 @@ namespace tch
                         vehicle->bogies[i].indexBefore = indexBe;
                         vehicle->bogies[i].indexAfter = indexAf;
 
-                        calculAngles(points[indexBe].pos, points[indexAf].pos, &vehicle->bogies[i].angleZ, &vehicle->bogies[i].angleY);
+                        //calculAngles(points[indexBe], points[indexAf], vehicle->bogies[i].pos, &vehicle->bogies[i].angleZ, &vehicle->bogies[i].angleY);
+                        calculAngles(vehicle->isTramway, points[indexBe], points[indexAf], vehicle->bogies, i);
 
                         indexPoint = indexAfter;
                         const size_t switchAfter = points[indexPoint].switchAfter;
