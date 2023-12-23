@@ -50,6 +50,8 @@ namespace tch
 
         const float speedKmh = (fabs(vehicle->speed) / frameTime) * 3600;
 
+        //std::cout << speedKmh << std::endl;
+
         float tractionStrength;
         const float beta = log(0.01f) / maxSpeed;
 
@@ -59,7 +61,7 @@ namespace tch
         }
         else
         {
-            tractionStrength = -10.0f * maxStrength;
+            tractionStrength = -weight * 4.2f;
         }
 
         if(inverter == 0)               //Neutre
