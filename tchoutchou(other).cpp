@@ -280,7 +280,7 @@ namespace tch
                 const glm::vec3 vecP1P2 = glm::normalize(p2.pos - p1.pos);
                 const glm::vec3 vecP1Bogy = glm::normalize(bogyPos - p1.pos);
 
-                if(glm::dot(vecP1P2, vecP1Bogy) >= 0.99f && glm::length(bogyPos - middle) <= lg/2)
+                if(glm::dot(vecP1P2, vecP1Bogy) >= 0.95f && glm::length(bogyPos - middle) <= lg/2)
                 {
                     *indexBe = i;
                     *indexAf = p1.indexAfter[switchAfter];

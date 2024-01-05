@@ -80,6 +80,28 @@ namespace tch
             points = array;
         }
 
+        void setSwitchAfter(const size_t indexPoint, const size_t value)
+        {
+            if(indexPoint <= points.size())
+            {
+                if(value <= points[indexPoint].indexAfter.size()-1)
+                {
+                    points[indexPoint].switchAfter = value;
+                }
+            }
+        }
+
+        void setSwitchBefore(const size_t indexPoint, const size_t value)
+        {
+            if(indexPoint <= points.size())
+            {
+                if(value <= points[indexPoint].indexBefore.size()-1)
+                {
+                    points[indexPoint].switchBefore = value;
+                }
+            }
+        }
+
         void LoadNetwork(const std::string path);
         void addVehicle(Vehicle *vehicle, size_t indexPoint);
         void commandVehicle(Vehicle *vehicle, const float weight, const float maxSpeed, const float maxStrength, const float traction, const int inverter, const bool reverse);
